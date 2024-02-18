@@ -1,0 +1,16 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+.nav-item{
+    margin-right: 30px;
+}
+.navbar-brand{
+    margin-left: 20px;
+}
+.post {
+    border-bottom: 1px solid #dee2e6;
+    padding: 15px 0;
+}

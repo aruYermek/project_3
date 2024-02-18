@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register and Login</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="registrationForm">
+            <h2>Registration</h2>
+            <form action="/register" method="post" id="registerForm" onsubmit="return registerUser()">
+                <div class="input-box">
+                    <input type="text" name="name" placeholder="Enter your name" required>
+                </div>
+                <div class="input-box">
+                    <input type="text" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Create a password" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" name="confirmPassword" placeholder="Confirm the password" required>
+                </div>
+                <div class="input-box button">
+                    <input type="submit" value="Register Now">
+                </div>
+                <div class="text">
+                    <h3>Do you have an account? <a href="#" onclick="toggleForm('loginForm')">Log In</a></h3>
+                </div>
+            </form>
+        </div>
+
+        <div id="loginForm" style="display: none;">
+            <h2>Log In</h2>
+            <form action="/login" method="post" id="loginForm" onsubmit="return loginUser()">
+                <div class="input-box">
+                    <input type="text" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="input-box">
+                    <input type="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <div class="input-box button">
+                    <input type="submit" value="Login">
+                </div>
+
+                <div class="text">
+                    <h3>Create a new account <a href="#" onclick="toggleForm('registrationForm')">Register Now</a></h3>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/index.js"></script>
+</body>
+
+</html>
