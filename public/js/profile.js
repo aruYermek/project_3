@@ -1,133 +1,64 @@
-const User = require('./models/userSchema.js');
-function redirectToFriend() {
-    window.location.href = "./friend.html";
-}
+window.onload = async function() {
+    try {
+        const response = await fetch('/users'); // Получаем данные пользователя с сервера
+        const userData = await response.json();
+        const user = userData[0]; // Предполагается, что вы получаете только одного пользователя
+        
+        document.getElementById('avatar').src = user.avatar;
+        document.getElementById('name').innerText = user.name;
+        document.getElementById('email').innerText = user.email;
+        document.getElementById('bio').innerText = user.bio;
 
-
-async function redirectToFriendProf() {
-    // Получаем имя друга из поля ввода
-    const friendName = document.querySelector('input[name="name"]').value;
-
-    // Получаем адрес друга из вашего смарт-контракта (предполагается, что у вас есть способ связать имя друга с его адресом)
-    const friendAddress = await getFriendAddressByName(friendName);
-
-    if (!friendAddress) {
-        alert("Friend not found!"); // Если друг с таким именем не найден, выводим сообщение об ошибке
-        return;
+        // Отобразите посты пользователя
+        const postsContainer = document.getElementById('posts');
+        user.posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+            postElement.innerHTML = `<p>${post}</p>`;
+            postsContainer.appendChild(postElement);
+        });
+    } catch (error) {
+        console.error('Error while retrieving user data:', error);
     }
+};
 
-    // Подключаемся к вашему смарт-контракту
-    const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // Замените на адрес вашего смарт-контракта
-    const contractABI = [{
-        "_format": "hh-sol-artifact-1",
-        "contractName": "SocialNetwork",
-        "sourceName": "contracts/ SocialNetwork.sol",
-        "abi": [
-          {
-            "inputs": [
-              {
-                "internalType": "address",
-                "name": "_friend",
-                "type": "address"
-              }
-            ],
-            "name": "addFriend",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-          },
-          {
-            "inputs": [],
-            "name": "getFriends",
-            "outputs": [
-              {
-                "internalType": "address[]",
-                "name": "",
-                "type": "address[]"
-              }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "address",
-                "name": "_user",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
-                "name": "_friend",
-                "type": "address"
-              }
-            ],
-            "name": "isFriend",
-            "outputs": [
-              {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-              }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-          },
-          {
-            "inputs": [
-              {
-                "internalType": "address",
-                "name": "_friend",
-                "type": "address"
-              }
-            ],
-            "name": "removeFriend",
-            "outputs": [],
-            "stateMutability": "nonpayable",
-            "type": "function"
-          }
-        ],
-        "bytecode": "0x608060405234801561001057600080fd5b50610a86806100206000396000f3fe608060405234801561001057600080fd5b506004361061004c5760003560e01c80631f8f7270146100515780632da5d42e1461006f57806380cee8a51461009f578063d7a1cfe1146100bb575b600080fd5b6100596100d7565b6040516100669190610805565b60405180910390f35b61008960048036038101906100849190610858565b6100dc565b60405161009691906108b3565b60405180910390f35b6100b960048036038101906100b491906108ce565b610172565b005b6100d560048036038101906100d091906108ce565b6103b2565b005b606090565b60008060008473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff16905092915050565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff1661023d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161023490610958565b60405180910390fd5b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600080820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000820160146101000a81549060ff021916905550506000808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600080820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000820160146101000a81549060ff0219169055505050565b3373ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1603610420576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610417906109c4565b60405180910390fd5b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff16156104ec576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016104e390610a30565b60405180910390fd5b60405180604001604052808273ffffffffffffffffffffffffffffffffffffffff168152602001600115158152506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160000160146101000a81548160ff02191690831515021790555090505060405180604001604052803373ffffffffffffffffffffffffffffffffffffffff168152602001600115158152506000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160000160146101000a81548160ff02191690831515021790555090505050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061076c82610741565b9050919050565b61077c81610761565b82525050565b600061078e8383610773565b60208301905092915050565b6000602082019050919050565b60006107b282610715565b6107bc8185610720565b93506107c783610731565b8060005b838110156107f85781516107df8882610782565b97506107ea8361079a565b9250506001810190506107cb565b5085935050505092915050565b6000602082019050818103600083015261081f81846107a7565b905092915050565b600080fd5b61083581610761565b811461084057600080fd5b50565b6000813590506108528161082c565b92915050565b6000806040838503121561086f5761086e610827565b5b600061087d85828601610843565b925050602061088e85828601610843565b9150509250929050565b60008115159050919050565b6108ad81610898565b82525050565b60006020820190506108c860008301846108a4565b92915050565b6000602082840312156108e4576108e3610827565b5b60006108f284828501610843565b91505092915050565b600082825260208201905092915050565b7f4e6f7420667269656e6473000000000000000000000000000000000000000000600082015250565b6000610942600b836108fb565b915061094d8261090c565b602082019050919050565b6000602082019050818103600083015261097181610935565b9050919050565b7f43616e6e6f742061646420796f757273656c66206173206120667269656e6400600082015250565b60006109ae601f836108fb565b91506109b982610978565b602082019050919050565b600060208201905081810360008301526109dd816109a1565b9050919050565b7f416c726561647920667269656e64730000000000000000000000000000000000600082015250565b6000610a1a600f836108fb565b9150610a25826109e4565b602082019050919050565b60006020820190508181036000830152610a4981610a0d565b905091905056fea2646970667358221220940958332d6e43cd826ff79d466102506d8b1b1c07ce968664139ccd4b7d367864736f6c63430008140033",
-        "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061004c5760003560e01c80631f8f7270146100515780632da5d42e1461006f57806380cee8a51461009f578063d7a1cfe1146100bb575b600080fd5b6100596100d7565b6040516100669190610805565b60405180910390f35b61008960048036038101906100849190610858565b6100dc565b60405161009691906108b3565b60405180910390f35b6100b960048036038101906100b491906108ce565b610172565b005b6100d560048036038101906100d091906108ce565b6103b2565b005b606090565b60008060008473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff16905092915050565b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff1661023d576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040161023490610958565b60405180910390fd5b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600080820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000820160146101000a81549060ff021916905550506000808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff168152602001908152602001600020600080820160006101000a81549073ffffffffffffffffffffffffffffffffffffffff02191690556000820160146101000a81549060ff0219169055505050565b3373ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1603610420576040517f08c379a0000000000000000000000000000000000000000000000000000000008152600401610417906109c4565b60405180910390fd5b6000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060000160149054906101000a900460ff16156104ec576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004016104e390610a30565b60405180910390fd5b60405180604001604052808273ffffffffffffffffffffffffffffffffffffffff168152602001600115158152506000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160000160146101000a81548160ff02191690831515021790555090505060405180604001604052803373ffffffffffffffffffffffffffffffffffffffff168152602001600115158152506000808373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008201518160000160006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555060208201518160000160146101000a81548160ff02191690831515021790555090505050565b600081519050919050565b600082825260208201905092915050565b6000819050602082019050919050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b600061076c82610741565b9050919050565b61077c81610761565b82525050565b600061078e8383610773565b60208301905092915050565b6000602082019050919050565b60006107b282610715565b6107bc8185610720565b93506107c783610731565b8060005b838110156107f85781516107df8882610782565b97506107ea8361079a565b9250506001810190506107cb565b5085935050505092915050565b6000602082019050818103600083015261081f81846107a7565b905092915050565b600080fd5b61083581610761565b811461084057600080fd5b50565b6000813590506108528161082c565b92915050565b6000806040838503121561086f5761086e610827565b5b600061087d85828601610843565b925050602061088e85828601610843565b9150509250929050565b60008115159050919050565b6108ad81610898565b82525050565b60006020820190506108c860008301846108a4565b92915050565b6000602082840312156108e4576108e3610827565b5b60006108f284828501610843565b91505092915050565b600082825260208201905092915050565b7f4e6f7420667269656e6473000000000000000000000000000000000000000000600082015250565b6000610942600b836108fb565b915061094d8261090c565b602082019050919050565b6000602082019050818103600083015261097181610935565b9050919050565b7f43616e6e6f742061646420796f757273656c66206173206120667269656e6400600082015250565b60006109ae601f836108fb565b91506109b982610978565b602082019050919050565b600060208201905081810360008301526109dd816109a1565b9050919050565b7f416c726561647920667269656e64730000000000000000000000000000000000600082015250565b6000610a1a600f836108fb565b9150610a25826109e4565b602082019050919050565b60006020820190508181036000830152610a4981610a0d565b905091905056fea2646970667358221220940958332d6e43cd826ff79d466102506d8b1b1c07ce968664139ccd4b7d367864736f6c63430008140033",
-        "linkReferences": {},
-        "deployedLinkReferences": {}
+document.getElementById('editProfileBtn').addEventListener('click', function() {
+  document.querySelector('.edit-profile-btn').style.display = 'none'; // Скрыть кнопку "Edit Account"
+  document.querySelector('.edit-profile-form').style.display = 'block'; // Отобразить форму редактирования
+});
+
+
+document.getElementById('editProfileForm').addEventListener('submit', async function(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(this);
+  
+  try {
+      const response = await fetch('/edit-profile', {
+          method: 'POST',
+          body: formData
+      });
+      
+      if (!response.ok) {
+          throw new Error('Failed to update profile');
       }
-      ]; // Замените на ABI вашего смарт-контракта
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-    try {
-        // Отправляем транзакцию на добавление друга
-        const tx = await contract.addFriendRequest(friendAddress);
-
-        // Ожидаем подтверждения транзакции
-        await tx.wait();
-
-        // Выводим сообщение об успешной отправке запроса на добавление друга
-        alert("Friend request sent successfully!");
-    } catch (error) {
-        // Выводим сообщение об ошибке, если что-то пошло не так при отправке транзакции
-        console.error("Error sending friend request:", error);
-        alert("Error sending friend request. Please try again later.");
-    }
-}
-
-// Функция для получения адреса друга по его имени
-async function getFriendAddressByName(friendName) {
-    try {
-        // Находим пользователя по его имени в базе данных
-        const friend = await User.findOne({ name: friendName });
-
-        // Проверяем, найден ли друг
-        if (!friend) {
-            return null; // Если друг не найден, возвращаем null
-        }
-
-        // Возвращаем адрес друга
-        return friend.address; // Предположим, что адрес хранится в поле address модели пользователя
-    } catch (error) {
-        console.error("Error fetching friend address:", error);
-        throw error; // Пробрасываем ошибку дальше
-    }
-}
+      
+      const responseData = await response.json();
+      const bio = formData.get('bio');
+      const avatarFile = formData.get('avatar');
+      
+      document.getElementById('bio').innerText = bio; 
+      if (avatarFile) {
+          const avatarURL = URL.createObjectURL(avatarFile); 
+          document.getElementById('avatar').src = avatarURL; 
+      }
+      
+      document.querySelector('.edit-profile-btn').style.display = 'block';
+      document.querySelector('.edit-profile-form').style.display = 'none';
+      
+      alert('Profile updated successfully');
+  } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile');
+  }
+});

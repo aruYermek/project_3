@@ -10,7 +10,17 @@
 .navbar-brand{
     margin-left: 20px;
 }
+.avatar{
+    width: 200px;
+    height: 300px;
+}
 .post {
     border-bottom: 1px solid #dee2e6;
     padding: 15px 0;
+}
+.edit-profile-btn{
+    margin-top: 20px;
+}
+.edit-profile-form h3{
+    margin-top: 20px;
 }
