@@ -1,16 +1,28 @@
-const express = require("express");
-const app = express();
-const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
+const express = require('express');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const authRoutes = require('./routes/authRoutes'); 
 const { connectDB } = require("./config/db");
 const User = require("./models/userSchema");
 const multer = require('multer');
 
-require("dotenv").config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(session({ secret: '_secret_key', resave: false, saveUninitialized: true }));
+app.use(express.static('public'));
+
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname+ '/public/register.html'));
+});
+
+app.use('/auth', authRoutes);
+
+require("dotenv").config();
 
 connectDB();
 
@@ -26,63 +38,28 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-app.post("/register", async (req, res) => {
-    const { name, email, password, confirmPassword } = req.body;
-    if (password !== confirmPassword) {
-        return res.status(400).json({ error: "Passwords do not match" });
-    }
-
+// Добавь новый маршрут для получения данных профиля текущего пользователя
+app.get("/profile", async (req, res) => {
     try {
-        const existingUser = await User.findOne({ email });
-        const existingEmail = await User.findOne({ name });
-
-        if (existingUser || existingEmail) {
-            return res.status(400).json({ error: "User is already registered" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        await User.create({ name, email, password: hashedPassword });
-
-        res.status(201).json({ message: "Registration successful" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
-
-app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        const user = await User.findOne({ email: username });
+        const currentUserEmail = req.session.userEmail;
+        const user = await User.findOne({ email: currentUserEmail });
 
         if (!user) {
-            return res.status(401).json({ success: false, error: "Username not found" });
+            return res.status(404).json({ error: "User not found" });
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
-
-        if (!passwordMatch) {
-            return res.status(401).json({ success: false, error: "Username or password does not match" });
-        }
-        res.status(200).json({ success: true, message: `Login successful, welcome ${username}`, redirect: "/main.html" });
-        
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, error: "Server error" });
-    }
-});
-
-app.get("/users", async (req, res) => {
-    try {
-        const users = await User.find();
-        res.status(200).json(users);
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            bio: user.bio,
+            avatar: user.avatar
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
     }
 });
+
 
 app.delete("/users/delete", async (req, res) => {
     try {
@@ -121,6 +98,19 @@ app.post("/edit-profile", upload.single('avatar'), async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
+
+app.get("/users/search", async (req, res) => {
+    const { email } = req.query;
+
+    try {
+        const users = await User.find({ email: email });
+        res.status(200).json({ message: "Yes" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 
 const port = process.env.PORT || 5500;
 app.listen(port, () => console.log(`Server is running on http://localhost:${port}`));

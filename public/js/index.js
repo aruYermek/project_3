@@ -20,7 +20,7 @@ function registerUser() {
     }
 
 
-    fetch('/register', {
+    fetch('/auth/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ function loginUser() {
     const password = loginForm.querySelector('[name="password"]').value;
 
 
-    fetch('/login', {
+    fetch('/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

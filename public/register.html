@@ -12,7 +12,7 @@
     <div class="wrapper">
         <div id="registrationForm">
             <h2>Registration</h2>
-            <form action="/register" method="post" id="registerForm" onsubmit="return registerUser()">
+            <form action="/auth/register" method="POST" onsubmit="return registerUser()">
                 <div class="input-box">
                     <input type="text" name="name" placeholder="Enter your name" required>
                 </div>
@@ -36,7 +36,7 @@
 
         <div id="loginForm" style="display: none;">
             <h2>Log In</h2>
-            <form action="/login" method="post" id="loginForm" onsubmit="return loginUser()">
+            <form action="/auth/login" method="post" id="loginForm" onsubmit="return loginUser()">
                 <div class="input-box">
                     <input type="text" name="username" placeholder="Enter your username" required>
                 </div>

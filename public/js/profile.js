@@ -1,30 +1,33 @@
-window.onload = async function() {
+document.addEventListener("DOMContentLoaded", async () => {
     try {
-        const response = await fetch('/users'); // Получаем данные пользователя с сервера
+        const response = await fetch("/profile");
         const userData = await response.json();
-        const user = userData[0]; // Предполагается, что вы получаете только одного пользователя
-        
-        document.getElementById('avatar').src = user.avatar;
-        document.getElementById('name').innerText = user.name;
-        document.getElementById('email').innerText = user.email;
-        document.getElementById('bio').innerText = user.bio;
 
-        // Отобразите посты пользователя
-        const postsContainer = document.getElementById('posts');
-        user.posts.forEach(post => {
-            const postElement = document.createElement('div');
-            postElement.classList.add('post');
-            postElement.innerHTML = `<p>${post}</p>`;
-            postsContainer.appendChild(postElement);
-        });
+        document.getElementById("name").innerHTML = userData.name;
+        document.getElementById("email").innerHTML = userData.email;
+        document.getElementById("bio").innerHTML = userData.bio;
+
+        // Обновление аватарки
+        const avatarImg = document.getElementById("avatar");
+        if (userData.avatar) {
+           
+            avatarImg.src = `/uploads/${userData.avatar}`;
+        } else {
+           
+            avatarImg.src = "/";
+        }
     } catch (error) {
-        console.error('Error while retrieving user data:', error);
+        console.error("Error fetching profile data:", error);
     }
-};
+});
 
 document.getElementById('editProfileBtn').addEventListener('click', function() {
   document.querySelector('.edit-profile-btn').style.display = 'none'; // Скрыть кнопку "Edit Account"
   document.querySelector('.edit-profile-form').style.display = 'block'; // Отобразить форму редактирования
+});
+  document.getElementById('addFriendButton').addEventListener('click', function() {
+    document.querySelector('.addFriendDiv').style.display = 'none';
+    document.querySelector('.searchFormDiv').style.display = 'block';
 });
 
 
@@ -61,4 +64,22 @@ document.getElementById('editProfileForm').addEventListener('submit', async func
       console.error('Error updating profile:', error);
       alert('Failed to update profile');
   }
+});
+document.getElementById('searchForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+
+    const formData = new FormData(this);
+    const searchQuery = formData.get('searchQuery'); 
+
+    try {
+        const response = await fetch(`/users/search?email=${searchQuery}`);
+        const users = await response.json();
+
+        console.log("Yes!")
+        
+    } catch (error) {
+        console.error('Error searching users:', error);
+       
+    }
 });
