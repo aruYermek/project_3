@@ -6,19 +6,16 @@ function toggleForm(formId) {
 
 
 function registerUser() {
-  
-    const registerForm = document.getElementById('registerForm');
+    const registerForm = document.getElementById('registrationForm');
     const name = registerForm.querySelector('[name="name"]').value;
     const email = registerForm.querySelector('[name="email"]').value;
     const password = registerForm.querySelector('[name="password"]').value;
     const confirmPassword = registerForm.querySelector('[name="confirmPassword"]').value;
 
-  
     if (password !== confirmPassword) {
         alert("Passwords do not match");
         return false;
     }
-
 
     fetch('/auth/register', {
         method: 'POST',
@@ -27,17 +24,20 @@ function registerUser() {
         },
         body: JSON.stringify({ name, email, password, confirmPassword }),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
-    
-        console.log(data);
         alert(data.message);
-
-
         registerForm.reset();
-
-
         toggleForm('loginForm');
+    })
+    .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        alert('Server error occurred');
     });
 
     return false;
