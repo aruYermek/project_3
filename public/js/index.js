@@ -6,7 +6,7 @@ function toggleForm(formId) {
 
 
 function registerUser() {
-    const registerForm = document.getElementById('registrationForm');
+    const registerForm = document.querySelector('#registrationForm form');
     const name = registerForm.querySelector('[name="name"]').value;
     const email = registerForm.querySelector('[name="email"]').value;
     const password = registerForm.querySelector('[name="password"]').value;

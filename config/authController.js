@@ -42,10 +42,12 @@ const login = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ success: false, error: "Username or password does not match" });
         }
+        req.session.userEmail = user.email;
         res.status(200).json({ success: true, message: `Login successful, welcome ${username}`, redirect: "/main.html" });
         
     } catch (error) {
         console.error(error);
+
         res.status(500).json({ success: false, error: "Server error" });
     }
 };

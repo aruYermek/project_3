@@ -7,6 +7,7 @@ const User = require("./models/userSchema");
 const multer = require('multer');
 
 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -29,10 +30,10 @@ connectDB();
 // Настройка multer для сохранения файлов
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './public/uploads/'); // Папка, куда сохранять файлы
+        cb(null, './public/uploads/'); 
     },
     filename: function(req, file, cb) {
-        cb(null, file.originalname); // Имя файла
+        cb(null, file.originalname);
     }
 });
 
@@ -41,18 +42,19 @@ const upload = multer({ storage: storage });
 // Добавь новый маршрут для получения данных профиля текущего пользователя
 app.get("/profile", async (req, res) => {
     try {
-        const currentUserEmail = req.session.userEmail;
-        const user = await User.findOne({ email: currentUserEmail });
+        const currentUserEmail = req.session.userEmail; // Получаем email текущего пользователя из сессии
+        const user = await User.findOne({ email: currentUserEmail }); // Находим пользователя по email
 
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Возвращаем данные о пользователе в формате JSON
         res.status(200).json({
             name: user.name,
             email: user.email,
             bio: user.bio,
-            avatar: user.avatar
+            // Другие данные о пользователе, которые вы хотите вернуть
         });
     } catch (error) {
         console.error(error);
@@ -61,20 +63,11 @@ app.get("/profile", async (req, res) => {
 });
 
 
-app.delete("/users/delete", async (req, res) => {
-    try {
-        await User.deleteMany();
-        res.status(200).json({ message: "All users deleted successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Server error" });
-    }
-});
 
-app.post("/edit-profile", upload.single('avatar'), async (req, res) => {
+app.get("/edit-profile", upload.single('avatar'), async (req, res) => {
     const { bio } = req.body;
     const avatar = req.file; 
-    const userEmail = req.body.email; // Предполагается, что вы отправляете email в запросе
+    const userEmail =  req.session.userEmail; // Предполагается, что вы отправляете email в запросе
 
     try {
         // Найдите пользователя по email
@@ -99,12 +92,21 @@ app.post("/edit-profile", upload.single('avatar'), async (req, res) => {
     }
 });
 
-app.get("/users/search", async (req, res) => {
+app.get("/search", async (req, res) => {
     const { email } = req.query;
 
     try {
-        const users = await User.find({ email: email });
-        res.status(200).json({ message: "Yes" });
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({
+            name: user.name,
+            email: user.email,
+            bio: user.bio
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Server error" });
