@@ -13,6 +13,12 @@ interactions are secured by smart contracts.
 
 We created Registraition/Login page and access to Metomask wallet and connect it
 
+# Assigment 2
+1.Solidity contract
+2.main page/profile page
+
+We created Registraition/Login page and access to Metomask wallet and connect it
+
 ## Getting Started
 
 These instructions will help you set up and run the project on your local machine.
@@ -72,6 +78,9 @@ The server will be running at http://localhost:5500
 - Express
 - MongoDB
 - bcrypt
+- Solidity
+- Web3
+
 
 ### License
 No license :D
